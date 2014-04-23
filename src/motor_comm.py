@@ -61,10 +61,17 @@ class motor_comm():
         GPIO.output(rec_output_enable_pin, GPIO.LOW)
         
         
-    def set_thrust(thrust_1=self.thrust[0],thrust_2=self.thrust[1]):
+    def set_thrust(thrust_1='a',thrust_2='a'):
       '''
       Function to set the thrust of the motors. If nothing is sent, the current thrust values are used.
       '''
+      #if a thrust number isn't sent then set thrust to what it was
+      if (thrust_1 == 'a'):
+        thrust_1=self.thrust[0]
+
+      if (thrust_2 == 'a'):
+        thrust_2=self.thrust[1]
+
       #motors take thrust levels between 1 and 0
       #scale inputs to be less than 1
       while (thrust_1 > 1):
