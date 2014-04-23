@@ -56,7 +56,7 @@ def main():
     #open the serial port
     UART.setup("UART4")
     try:        
-        port = serial.Serial(port = "/dev/ttyO4",115200)
+        port = serial.Serial(port = "/dev/ttyO4",baudrate=115200)
         port.timeout = 1
     except IOError:
         print ("Error:  Could not open serial port: " + args.portname)     
@@ -69,7 +69,7 @@ def main():
     CSR_address = ADDR_CUSTOM_COMMAND
     length = 2 + len(thrust) * 4
     header = bytearray(struct.pack('HBBBB',SYNC_REQUEST,int(args.node_id),flag,CSR_address,length))
-    header_checksum = bytearray(struct.pack('I', binascii.crc32(header))) 
+    header_checksum = bytearray(struct.pack('i', binascii.crc32(header))) 
 
     #generate the paylaod, limiting the thrust to reasonable values
     payload = bytearray(struct.pack('BB', PROPULSION_COMMAND, int(args.motor_id)))
@@ -79,7 +79,7 @@ def main():
         payload += bytearray(struct.pack('f',t))
 	
   #  print (binascii.crc32(payload))
-    payload_checksum = bytearray(struct.pack('I', binascii.crc32(payload)))    
+    payload_checksum = bytearray(struct.pack('i', binascii.crc32(payload)))    
 
     #send the packet and wait for a response
     packet = header + header_checksum + payload + payload_checksum 
