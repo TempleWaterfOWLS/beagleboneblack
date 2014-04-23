@@ -61,7 +61,7 @@ class motor_comm():
         GPIO.output(rec_output_enable_pin, GPIO.LOW)
         
         
-    def set_thrust(thrust_1='a',thrust_2='a'):
+    def set_thrust(self,thrust_1='a',thrust_2='a'):
       '''
       Function to set the thrust of the motors. If nothing is sent, the current thrust values are used.
       '''
@@ -82,14 +82,14 @@ class motor_comm():
       self.thrust[0]=thrust_1
       self.thrust[1]=thrust_2
         
-    def set_motor_response_node(motor_node):
+    def set_motor_response_node(self,motor_node):
       '''
       Set motor response node
       '''
       self.motor_response_node = motor_node
     
     
-    def send_motors_power_level():
+    def send_motors_power_level(self):
       '''
       Sends communication to motors
       Returns response list from the motor set in self.motor_node
