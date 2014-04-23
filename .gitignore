@@ -1,1 +1,4 @@
+#ignore temp files from gedit
 *~
+#ignore compiled(?) files from BeagleBoneBlack
+*.py.swp
