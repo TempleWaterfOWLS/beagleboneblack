@@ -12,7 +12,7 @@ import Adafruit_BBIO.GPIO as GPIO
 
 
 class motor_comm():
-    def self.__init__(self):
+    def __init__(self):
         #VRCSR protocol defines  
         self.SYNC_REQUEST  =  0x5FF5
         self.SYNC_RESPONSE =  0x0FF0
@@ -61,68 +61,67 @@ class motor_comm():
         GPIO.output(rec_output_enable_pin, GPIO.LOW)
         
         
-    def self.set_thrust(thrust_1=self.thrust[0],thrust_2=self.thrust[1]):
-    '''
-    Function to set the thrust of the motors. If nothing is sent, the current thrust values are used.
-    '''
-        #motors take thrust levels between 1 and 0
-        #scale inputs to be less than 1
-        while (thrust_1 > 1):
-            thrust_1=thrust_1/10
-        while (thrust_2 > 1):
-            thrust_2=thrust_2/10
+    def set_thrust(thrust_1=self.thrust[0],thrust_2=self.thrust[1]):
+      '''
+      Function to set the thrust of the motors. If nothing is sent, the current thrust values are used.
+      '''
+      #motors take thrust levels between 1 and 0
+      #scale inputs to be less than 1
+      while (thrust_1 > 1):
+        thrust_1=thrust_1/10
+      while (thrust_2 > 1):
+        thrust_2=thrust_2/10
             
-        self.thrust[0]=thrust_1
-        self.thrust[1]=thrust_2
+      self.thrust[0]=thrust_1
+      self.thrust[1]=thrust_2
         
-    def self.set_motor_response_node(motor_node):
-    '''
-    Set motor response node
-    '''
-        self.motor_response_node = motor_node
+    def set_motor_response_node(motor_node):
+      '''
+      Set motor response node
+      '''
+      self.motor_response_node = motor_node
     
     
-    def self.send_motors_power_level():
-    '''
-    Sends communication to motors
-    Returns response list from the motor set in self.motor_node
-    '''
+    def send_motors_power_level():
+      '''
+      Sends communication to motors
+      Returns response list from the motor set in self.motor_node
+      '''
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
-        flag = RESPONSE_THRUSTER_STANDARD
-        CSR_address = ADDR_CUSTOM_COMMAND
-        length = 2 + len(self.thrust) * 4
-        header = bytearray(struct.pack('HBBBB',SYNC_REQUEST,int(self.motor_response_node),flag,CSR_address,length))
-        header_checksum = bytearray(struct.pack('i', binascii.crc32(header))) 
+      flag = RESPONSE_THRUSTER_STANDARD
+      CSR_address = ADDR_CUSTOM_COMMAND
+      length = 2 + len(self.thrust) * 4
+      header = bytearray(struct.pack('HBBBB',SYNC_REQUEST,int(self.motor_response_node),flag,CSR_address,length))
+      header_checksum = bytearray(struct.pack('i', binascii.crc32(header))) 
 
-        #generate the payload, limiting the thrust to reasonable values
-        payload = bytearray(struct.pack('BB', PROPULSION_COMMAND, int(args.motor_id)))
-        for t in thrust:
-            t = max(t,-1)
-            t = min(t, 1)
-            payload += bytearray(struct.pack('f',t))
+      #generate the payload, limiting the thrust to reasonable values
+      payload = bytearray(struct.pack('BB', PROPULSION_COMMAND, int(args.motor_id)))
+      for t in thrust:
+          t = max(t,-1)
+          t = min(t, 1)
+          payload += bytearray(struct.pack('f',t))
         
-        payload_checksum = bytearray(struct.pack('i', binascii.crc32(payload)))    
+      payload_checksum = bytearray(struct.pack('i', binascii.crc32(payload)))    
 
-        #send the packet and wait for a response
-        packet = header + header_checksum + payload + payload_checksum 
+      #send the packet and wait for a response
+      packet = header + header_checksum + payload + payload_checksum 
 
-        #put the packet on the wire
-        self.port.write(bytes(packet))
+      #put the packet on the wire
+      self.port.write(bytes(packet))
 
-        #get the response
-        expected_response_length = self.PROTOCOL_VRCSR_HEADER_SIZE + self.PROTOCOL_VRCSR_XSUM_SIZE +  self.RESPONSE_THRUSTER_STANDARD_LENGTH +  self.PROTOCOL_VRCSR_XSUM_SIZE
+      #get the response
+      expected_response_length = self.PROTOCOL_VRCSR_HEADER_SIZE + self.PROTOCOL_VRCSR_XSUM_SIZE +  self.RESPONSE_THRUSTER_STANDARD_LENGTH +  self.PROTOCOL_VRCSR_XSUM_SIZE
 
-        #read in lines from sent message 
-        response_buf = self.port.read(len(bytes(packet)))
+      #read in lines from sent message 
+      response_buf = self.port.read(len(bytes(packet)))
         
-        #read in received lines sent from motor
-        response_buf = port.read(expected_response_length)
-        print ("Got response: %d" % len(response_buf))
+      #read in received lines sent from motor
+      response_buf = port.read(expected_response_length)
+      print ("Got response: %d" % len(response_buf))
 
-        #parse the response
-        self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
-
+      #parse the response
+      self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
 
     '''#header data
     sync =              response[0]
