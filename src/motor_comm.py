@@ -90,16 +90,23 @@ def main():
     packet = header + header_checksum + payload + payload_checksum 
 
     #put the packet on the wire
-    t=time.time()
+    #t=time.time()
     port.write(bytes(packet))
-
+    #t=time.time()
 
     #get the response
 
+    #GPIO.output(rec_output_enable_pin, GPIO.LOW)
+    #time.sleep(0.05)
+
     expected_response_length = PROTOCOL_VRCSR_HEADER_SIZE + PROTOCOL_VRCSR_XSUM_SIZE +  RESPONSE_THRUSTER_STANDARD_LENGTH +  PROTOCOL_VRCSR_XSUM_SIZE
  #   print (expected_response_length)
+
+    #Let TTl-RS485 board receive info
+    #GPIO.output(rec_output_enable_pin, GPIO.LOW)
+    response_buf = port.read(len(bytes(packet)))
     response_buf = port.read(expected_response_length)
-    print("Elapsed time: %f" % (time.time()-t))
+    #print("Elapsed time: %f" % (time.time()-t))
     print ("Got response: %d" % len(response_buf))
     #parse the response
     response = struct.unpack('=HBBBB I BffffB I', response_buf)
