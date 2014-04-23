@@ -8,6 +8,7 @@ import binascii
 
 #for BeagleBoneBlack
 import Adafruit_BBIO.UART as UART
+import Adafruit_BBIO.GPIO as GPIO
 
 import time
 
@@ -61,7 +62,11 @@ def main():
     except IOError:
         print ("Error:  Could not open serial port: " + args.portname)     
         sys.exit()
-
+    
+    #setup GPIO
+    rec_output_enable_pin="P9_12"
+    GPIO.setup(rec_output_enable_pin, GPIO.OUT)
+    GPIO.output(rec_output_enable_pin, GPIO.LOW)
         
     #Create the custom command packet for setting the power level to a group of thrusters
     #generate the header
