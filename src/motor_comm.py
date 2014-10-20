@@ -6,6 +6,10 @@ import operator
 import argparse
 import binascii
 
+#for BeagleBoneBlack
+import Adafruit_BBIO.UART as UART
+import serial
+
 import time
 
 #VRCSR protocol defines  
