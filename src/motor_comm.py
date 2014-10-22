@@ -8,7 +8,6 @@ import binascii
 
 #for BeagleBoneBlack
 import Adafruit_BBIO.UART as UART
-import serial
 
 import time
 
@@ -55,8 +54,9 @@ def main():
         thrust = args.thrust
 
     #open the serial port
+    UART.setup("UART4")
     try:        
-        port = serial.Serial(args.portname,115200)
+        port = serial.Serial(port = "/dev/ttyO4",115200)
         port.timeout = 1
     except IOError:
         print ("Error:  Could not open serial port: " + args.portname)     
