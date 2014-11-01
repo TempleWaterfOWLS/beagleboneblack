@@ -14,7 +14,8 @@ import time
 # Create instance of app
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-
+with open('input_args', 'w') as in_file:
+    in_file.write('0.0\n0.0')
 # Function to set up main page and motor logic
 @app.route('/', methods=['GET','POST'])
 def main_page():
@@ -56,6 +57,14 @@ def main_page():
         # Toggle stop value
         elif 'stop' in request.form.keys():
             session['stop'] = not session['stop']
+            if session['stop'] == False:
+                with open('input_args', 'w') as arg_file:
+                    arg_file.write(str(session['M1'])+'\n')
+                    arg_file.write(str(session['M2']))
+            else:
+                with open('input_args', 'w') as arg_file:
+                    arg_file.write(str(0.0) + '\n')
+                    arg_file.write(str(0.0))
 
         # Got unexpected POST
         else:
@@ -67,22 +76,9 @@ def main_page():
     print "VALUES IN SESSION DICT"
     for keys in session.keys():
         print 'Key: ' + keys + ' Value: ' + str(session[keys])
+        
     # Return Template
     return render_template('backup.html',session=session)
 
 if __name__ == '__main__':    
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
