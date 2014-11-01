@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Boat Mechanics Zack Is The Coolest</title>
+  </head>
+  <body>
+    <center>
+      Stop value is: {{ session['stop'] }} <br>
+    {% if session['M1'] %}
+    Motor 1 Speed: {{ session['M1'] }}
+    <br>
+    {% endif %}
+    {% if session['M2'] %}
+    Motor 2 Speed: {{ session['M2'] }}
+    <br>
+    {% endif %}
+    Please select motor speed: 
+    <br>
+    MOTOR 1:
+    <form action="" method="post">
+      <p><input type=text name="M1">
+      <p><input type=submit value="Set Motor_1 Thrust">
+    </form>
+    MOTOR 2: 
+    <form action="" method="post">
+      <p><input type=text name="M2">
+      <p><input type=submit value="Set Motor_2 Thrust">
+    </form>
+    
+    <form method='post' action=''><input type='submit' name='stop' value='Toggle On/Off'></input></form>
+    {% if session['error'] %}
+    <p> Invalid Motor Input </p>
+    {% endif %}
+ </body>
+</html>
+

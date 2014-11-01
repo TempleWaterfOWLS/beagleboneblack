@@ -1,18 +1,91 @@
+''' 
+Web Server Application meant to run on beagleboard for control of a robot over WLAN
+Creates website as front-end for submitting thrust data to motors on robot
+Created by Zack Smith 10/31/14
+'''
+# Imports for website generation
 from flask import *
+import os
+# Imports for motor integration
+from threading import Thread
+import time
+# import motor_control as mc
+
 # Create instance of app
 app = Flask(__name__)
-# Set default motor speeds
-m1val = 0; m2val = 0; pow_setting = 10;
-
-@app.route('/')
-@app.route('/<m1val>/<m2val>')
-def main_page(m1val,m2val):
-    print m1val,m2val
-    # Call thrust function on a timer:
-    #    thrust(m1val,m2val)
-    # Return template using motor values for routing purposes
-    return render_template('index.html',m1val=m1val,m2val=m2val)
+app.secret_key = os.urandom(24)
+global t 
 
 
-if __name__ == '__main__':
+# Function to check threading library capabilities
+def infinite_loop():
+    while(1):
+        print "Thread running..."
+        time.sleep(2)
+
+# Function to set up main page and motor logic
+@app.route('/', methods=['GET','POST'])
+def main_page():
+    # Initialize session dictionary
+    session['error'] = False
+    if 'stop' not in session.keys():
+        session['stop'] = True
+    if 'thread' not in session.keys():
+        session['thread'] = False
+        session['threadval'] = None
+    if 'manager' not in session.keys():
+        session['manager'] = True
+        
+    # Check for post response
+    if request.method == 'POST':
+        # Parse request keys for info
+        if 'M1' in request.form.keys():
+            try:
+                session['M1'] = float(request.form['M1'])
+                if session['M1'] > 99:
+                    session['M1'] = 99.0
+                elif session['M1'] < -99:
+                    session['M1'] = -99.0
+            except ValueError:
+                session['error'] = True
+        # Check M2 Value
+        elif 'M2' in request.form.keys():
+            try:
+                session['M2'] = float(request.form['M2'])
+                if session['M2'] > 99:
+                    session['M2'] = 99.0
+                elif session['M2'] < -99:
+                    session['M2'] = -99.0
+            except ValueError:
+                session['error'] = True
+
+        # Toggle motors
+        elif 'stop' in request.form.keys():
+            session['stop'] = not session['stop']
+            session['M1'] = 0.0
+            session['M2'] = 0.0
+
+        # Got unexpected POST
+        else:
+            print "Unhandled POST keys:"
+            print request.form.keys()
+    # Print debugging info
+    print "-----------------------------------"
+    print "VALUES IN SESSION DICT"
+    for keys in session.keys():
+        print 'Key: ' + keys + ' Value: ' + str(session[keys])
+    # If stop is not enabled
+    if not session['stop'] and not session['thread']:
+        # Create new thread to execute motor control code
+        t =Thread(target=infinite_loop)
+        t.daemon = True
+        t.start()
+        session['thread'] = True
+
+    return render_template('backup.html',session=session)
+
+
+if __name__ == '__main__':    
+
     app.run(debug=True)
+
