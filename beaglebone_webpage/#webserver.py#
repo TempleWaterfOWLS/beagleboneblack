@@ -56,7 +56,7 @@ def main_page():
         # Toggle stop value
         elif 'stop' in request.form.keys():
             session['stop'] = not session['stop']
-
+            
         # Got unexpected POST
         else:
             print "Unhandled POST keys:"
@@ -67,22 +67,9 @@ def main_page():
     print "VALUES IN SESSION DICT"
     for keys in session.keys():
         print 'Key: ' + keys + ' Value: ' + str(session[keys])
+        
     # Return Template
     return render_template('backup.html',session=session)
 
 if __name__ == '__main__':    
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
