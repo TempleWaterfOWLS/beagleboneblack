@@ -10,7 +10,6 @@ import binascii
 import Adafruit_BBIO.UART as UART
 import Adafruit_BBIO.GPIO as GPIO
 
-import time
 
 #VRCSR protocol defines  
 SYNC_REQUEST  =  0x5FF5
@@ -66,6 +65,7 @@ def main():
     #setup GPIO
     rec_output_enable_pin="P9_12"
     GPIO.setup(rec_output_enable_pin, GPIO.OUT)
+    #set receiver output enable to enable
     GPIO.output(rec_output_enable_pin, GPIO.LOW)
         
     #Create the custom command packet for setting the power level to a group of thrusters
@@ -83,31 +83,24 @@ def main():
         t = min(t, 1)
         payload += bytearray(struct.pack('f',t))
 	
-  #  print (binascii.crc32(payload))
     payload_checksum = bytearray(struct.pack('i', binascii.crc32(payload)))    
 
     #send the packet and wait for a response
     packet = header + header_checksum + payload + payload_checksum 
 
     #put the packet on the wire
-    #t=time.time()
     port.write(bytes(packet))
-    #t=time.time()
 
     #get the response
-
-    #GPIO.output(rec_output_enable_pin, GPIO.LOW)
-    #time.sleep(0.05)
-
     expected_response_length = PROTOCOL_VRCSR_HEADER_SIZE + PROTOCOL_VRCSR_XSUM_SIZE +  RESPONSE_THRUSTER_STANDARD_LENGTH +  PROTOCOL_VRCSR_XSUM_SIZE
- #   print (expected_response_length)
 
-    #Let TTl-RS485 board receive info
-    #GPIO.output(rec_output_enable_pin, GPIO.LOW)
+    #read in lines from sent message 
     response_buf = port.read(len(bytes(packet)))
+    
+    #read in recieved lines sent from motor
     response_buf = port.read(expected_response_length)
-    #print("Elapsed time: %f" % (time.time()-t))
     print ("Got response: %d" % len(response_buf))
+
     #parse the response
     response = struct.unpack('=HBBBB I BffffB I', response_buf)
         
@@ -122,7 +115,6 @@ def main():
     #response device type
     device_type      =   response[6];
 
-    #
     rpm = response[7]
     bus_v = response[8]
     bus_i = response[9]
