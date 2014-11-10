@@ -36,7 +36,7 @@ class motor_comm():
         #standard response is the device type followed by 4 32-bit floats and 1 byte
         self.RESPONSE_THRUSTER_STANDARD_LENGTH = 1 + 4 * 4 + 1 
 
-        #The proppulsion command packets are typically sent as a multicast to a group ID defined for thrusters
+        #The propulsion command packets are typically sent as a multicast to a group ID defined for thrusters
         self.THRUSTER_GROUP_ID    = 0x81
         
         #default to 0 thrust for motor 
@@ -96,15 +96,16 @@ class motor_comm():
       '''
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
-      flag = RESPONSE_THRUSTER_STANDARD
-      CSR_address = ADDR_CUSTOM_COMMAND
+      flag = self.RESPONSE_THRUSTER_STANDARD
+      CSR_address = self.ADDR_CUSTOM_COMMAND
       length = 2 + len(self.thrust) * 4
-      header = bytearray(struct.pack('HBBBB',SYNC_REQUEST,int(self.motor_response_node),flag,CSR_address,length))
+      command_node=self.THRUSTER_GROUP_ID
+      header = bytearray(struct.pack('HBBBB',self.SYNC_REQUEST,int(command_node),flag,CSR_address,length))
       header_checksum = bytearray(struct.pack('i', binascii.crc32(header))) 
 
       #generate the payload, limiting the thrust to reasonable values
-      payload = bytearray(struct.pack('BB', PROPULSION_COMMAND, int(args.motor_id)))
-      for t in thrust:
+      payload = bytearray(struct.pack('BB', self.PROPULSION_COMMAND, int(self.motor_response_node)))
+      for t in self.thrust:
           t = max(t,-1)
           t = min(t, 1)
           payload += bytearray(struct.pack('f',t))
@@ -124,7 +125,7 @@ class motor_comm():
       response_buf = self.port.read(len(bytes(packet)))
         
       #read in received lines sent from motor
-      response_buf = port.read(expected_response_length)
+      response_buf = self.port.read(expected_response_length)
       print ("Got response: %d" % len(response_buf))
 
       #parse the response
