@@ -9,7 +9,7 @@ import os
 # Imports for motor integration - use thread to spawn threads and adjust global motor vals
 from threading import Thread
 import time
-# import motor_control as mc
+from motor_comm import *
 M1 = -.1; M2 = -.1
 # Create instance of app
 app = Flask(__name__)
@@ -99,14 +99,20 @@ def spawn_threads():
         time.sleep(5)
 '''
 def print_thrust():
+    #create object of class motor_comm
+    motors = motor_comm()
     while not isinstance(M1,int) and not isinstance(M2,int):
         if (M1 == -.1 and M2 == -.1):
             continue
+        print "Set thrust M1: "+ str(M1)+" M2: "+str(M2)
+        motors.set_thrust(M1,M2)
+        print "Sending motor command"
+        motors.send_motors_power_level()
         print "Print Thrust"
         print M1, M2
         print type(M1), type(M2)
         print "Ending thrust..."
-        time.sleep(1)
+        time.sleep(.25)
         print "execution finish"
 
 if __name__ == '__main__':    
