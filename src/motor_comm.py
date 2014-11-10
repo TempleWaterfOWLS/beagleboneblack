@@ -1,4 +1,3 @@
-
 import serial
 import struct
 import sys
@@ -131,7 +130,7 @@ class motor_comm():
       #parse the response
       self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
 
-    '''#header data
+    #header data
     sync =              response[0]
     response_node_id =  response[1]
     flag =              response[2]
@@ -166,5 +165,5 @@ class motor_comm():
     print ("\tFault:\t\t\t0x%x" % fault)
 
     print ("\t\tChecksum: 0x%x" % payload_checksum)
-'''
+
 
