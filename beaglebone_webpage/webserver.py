@@ -7,6 +7,7 @@ Created by Zack Smith 10/31/14
 from flask import *
 import os
 # Imports for motor integration - use thread to spawn threads and adjust global motor vals
+from motor_comm import *
 from threading import Thread
 import time
 M1 = -.0001; M2 = -.0001
@@ -94,18 +95,28 @@ def set_globvar_M2(t_val):
     M2 = t_val
 
 def print_thrust():
+    #create object of class motor_comm
+    motors = motor_comm()
+    node_id = 0
     while not isinstance(M1,int) and not isinstance(M2,int):
         if (M1 == -.0001 and M2 == -.0001):
             continue
-        # print "Set thrust M1: "+ str(M1)+" M2: "+str(M2)
-        # print "Sending motor command"
+        print "Set thrust M1: "+ str(M1)+" M2: "+str(M2)
+        print "Sending motor command"
+        motors.set_thrust(M1,M2)
         #move motors and get response
-        # print "Print Thrust"
-        # print M1, M2
-        # print type(M1), type(M2)
-        # print "Ending thrust..."
+        motors.set_motor_response_node(node_id)
+        response=motors.send_motors_power_level()
+        if (node_id==1):
+            node_id = 0
+        else:
+            node_id = 1
+        print "Print Thrust"
+        print M1, M2
+        print type(M1), type(M2)
+        print "Ending thrust..."
         time.sleep(.25)
-        # print "execution finish"
+        print "execution finish"
 
 if __name__ == '__main__':    
     t = Thread(target=print_thrust)
