@@ -10,7 +10,7 @@ import os
 from threading import Thread
 import time
 from motor_comm import *
-M1 = -.1; M2 = -.1
+M1 = -.0001; M2 = -.0001
 # Create instance of app
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -89,15 +89,7 @@ def set_globvar_M1(t_val):
 def set_globvar_M2(t_val):
     global M2
     M2 = t_val
-'''
-def spawn_threads():
-    while 1:
-        print "Spawning thread..."
-        child_thread = Thread(target=print_thrust)
-        child_thread.daemon = True
-        child_thread.start()
-        time.sleep(5)
-'''
+
 def print_thrust():
     #create object of class motor_comm
     motors = motor_comm()
