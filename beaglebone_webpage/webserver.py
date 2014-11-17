@@ -101,13 +101,21 @@ def spawn_threads():
 def print_thrust():
     #create object of class motor_comm
     motors = motor_comm()
+    #number to keep track of which motor node polled
+    node_id=0
     while not isinstance(M1,int) and not isinstance(M2,int):
         if (M1 == -.1 and M2 == -.1):
             continue
         print "Set thrust M1: "+ str(M1)+" M2: "+str(M2)
         motors.set_thrust(M1,M2)
+	motors.set_motor_response_node(node_id)
         print "Sending motor command"
-        motors.send_motors_power_level()
+	#move motors and get response
+        response=motors.send_motors_power_level()
+	if (node_id==1):
+	    node_id = 0
+	else:
+	    node_id = 1
         print "Print Thrust"
         print M1, M2
         print type(M1), type(M2)
@@ -119,4 +127,4 @@ if __name__ == '__main__':
     t = Thread(target=print_thrust)
     t.daemon = True
     t.start()
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=False)
