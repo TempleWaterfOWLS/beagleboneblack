@@ -92,6 +92,20 @@ class motor_comm():
       '''
       Sends communication to motors
       Returns response list from the motor set in self.motor_node
+      Contents of response list
+      	[0] = sync (hex)
+	[1]= response node id (int)
+	[2] = flag (hex)
+	[3] = CSR address (hex)
+	[4] = length (hex)
+	[5] = header checksum (hex)
+	[6] = device type (hex)
+	[7] = rpm (float)
+	[8] = bus voltage (float)
+	[9] = bus current (float)
+	[10] = temperature (float C)
+	[11] = fault (hex)
+	[12] = payload checksum (hex)
       '''
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
