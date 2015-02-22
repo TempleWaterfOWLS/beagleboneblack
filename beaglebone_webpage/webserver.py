@@ -14,7 +14,7 @@ M1 = -.0001; M2 = -.0001
 # Create instance of app
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-
+response_array = []
 # Function to set up main page and motor logic
 @app.route('/', methods=['GET','POST'])
 def main_page():
@@ -107,6 +107,7 @@ def print_thrust():
         #move motors and get response
         motors.set_motor_response_node(node_id)
         response=motors.send_motors_power_level()
+        response_array.append(response)
         if (node_id==1):
             node_id = 0
         else:
@@ -117,6 +118,13 @@ def print_thrust():
         print "Ending thrust..."
         time.sleep(.25)
         print "execution finish"
+
+# Route to send data back to requesting thing
+@app.route('/pythoninfo', methods=['GET'])
+def send_data():
+    sent_data = response_array
+    response_array = []
+    return sent_data
 
 if __name__ == '__main__':    
     t = Thread(target=print_thrust)
