@@ -92,6 +92,20 @@ class motor_comm():
       '''
       Sends communication to motors
       Returns response list from the motor set in self.motor_node
+      Contents of response list
+      	[0] = sync (hex)
+	[1]= response node id (int)
+	[2] = flag (hex)
+	[3] = CSR address (hex)
+	[4] = length (hex)
+	[5] = header checksum (hex)
+	[6] = device type (hex)
+	[7] = rpm (float)
+	[8] = bus voltage (float)
+	[9] = bus current (float)
+	[10] = temperature (float C)
+	[11] = fault (hex)
+	[12] = payload checksum (hex)
       '''
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
@@ -130,40 +144,5 @@ class motor_comm():
       #parse the response
       self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
 
-    #header data
-    sync =              response[0]
-    response_node_id =  response[1]
-    flag =              response[2]
-    CSR_address =       response[3]
-    length =            response[4]
-    header_checksum =   response[5]
-
-    #response device type
-    device_type      =   response[6];
-
-    rpm = response[7]
-    bus_v = response[8]
-    bus_i = response[9]
-    temp = response[10]
-    fault = response[11]
-
-    payload_checksum = response[12]
-
-    print ("\nResponse:")
-    print ("\tSync:\t\t0x%x" % sync)
-    print ("\tId:\t\t%d" % response_node_id)
-    print ("\tFlag:\t\t0x%x" % flag)
-    print ("\tAddress:\t0x%x" % CSR_address)
-    print ("\tLength:\t\t0x%x" % length)
-    print ("\t\tChecksum: 0x%x" % header_checksum)
-
-    print ("\n\tDevice Type:\t\t0x%x" % device_type)
-    print ("\tRPM:\t\t\t%f" % rpm)
-    print ("\tBus Voltage (V):\t%f" % bus_v)
-    print ("\tBus Current (A):\t%f" % bus_i)
-    print ("\tTemp (C):\t\t%f" % temp)
-    print ("\tFault:\t\t\t0x%x" % fault)
-
-    print ("\t\tChecksum: 0x%x" % payload_checksum)
 
 
