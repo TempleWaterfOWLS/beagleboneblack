@@ -1,0 +1,2 @@
+string motor_id
+float32 power
