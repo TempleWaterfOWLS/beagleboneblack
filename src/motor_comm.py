@@ -9,6 +9,8 @@ import binascii
 import Adafruit_BBIO.UART as UART
 import Adafruit_BBIO.GPIO as GPIO
 
+#for ROS
+import rospy
 
 class motor_comm():
     def __init__(self):
