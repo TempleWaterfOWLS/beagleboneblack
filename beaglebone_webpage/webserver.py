@@ -1,7 +1,7 @@
 ''' 
-Web Server Application meant to run on beagleboard for control of a robot over WLAN
-Creates website as front-end for submitting thrust data to motors on robot
-Created by Zack Smith 10/31/14
+ Web Server Application meant to run on beagleboard for control of a robot over WLAN
+ Creates website as front-end for submitting thrust data to motors on robot
+ Created by Zack Smith 10/31/14
 '''
 # Imports for website generation
 from flask import *
@@ -20,6 +20,9 @@ import time
 #ROS imports
 import rospy
 from beagleboneblack.msg import MotorPower
+
+pub = rospy.Publisher('motor_power', MotorPower, queue_size=10)
+rospy.init_node('motor_control_website',anonymous=True)
 
 M1 = -.0001; M2 = -.0001
 # Create instance of app
@@ -108,8 +111,6 @@ def set_globvar_M2(t_val):
 def print_thrust():
     #create object of class motor_comm
     motors = motor_comm()
-    pub = rospy.Publisher('motor_power', MotorPower, queue_size=10)
-    rospy.init_node('motor_control_website')
     motor_power = MotorPower()
     
     node_id = 0
