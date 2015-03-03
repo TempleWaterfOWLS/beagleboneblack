@@ -7,9 +7,14 @@ Created by Zack Smith 10/31/14
 from flask import *
 import os
 # Imports for motor integration - use thread to spawn threads and adjust global motor vals
+#change PYTHONPATH to find motor_comm
+import sys
+sys.path.append("../src")
+
 from motor_comm import *
 from threading import Thread
 import time
+
 M1 = -.0001; M2 = -.0001
 # Create instance of app
 app = Flask(__name__)
