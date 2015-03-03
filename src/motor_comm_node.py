@@ -25,8 +25,8 @@ def motor_response_to_ros(motors, pub, now):
   motor_data = MotorResponse()
   
   #filling out MotorResponse message
-  motor_data.stamp.secs = now.secs
-  motor_data.stamp.nsecs = now.nsecs
+  motor_data.header.stamp.secs = now.secs
+  motor_data.header.stamp.nsecs = now.nsecs
   motor_data.motor_id = motors.response[1]
   motor_data.rpm = motors.response[7]
   motor_data.bus_voltage = motors.response[8]
