@@ -150,18 +150,16 @@ class motor_comm():
         for x in range(0,13):
           self.response.append(0)
         
-    def toggle_node_id(self, node_id):
+    def toggle_node_id(self):
       '''
-      Toggles node id
-      Takes current node id
-      Sets new node id
+      Toggles node id between 0 and 1
       '''
-      if (node_id==1):
+      if (self.motor_response_node==1):
         node_id = 0
       else:
         node_id = 1
 
-      self.motor_response_node=self.set_motor_response_node(node_id)
+      self.set_motor_response_node(node_id)
 
 
 
