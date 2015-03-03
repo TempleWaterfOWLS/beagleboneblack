@@ -45,7 +45,8 @@ def motor_node():
   rospy.init_node('motor_comm')
   rospy.Subscriber("motor_power", MotorPower, power_level)
   rate = rospy.Rate(10)
-    
+  
+  #spins at 10 Hz and puts the motors response on ROS
   while not rospy.is_shutdown():
     motors.send_motors_power_level()
     motor_response_to_ros(motors, pub)
