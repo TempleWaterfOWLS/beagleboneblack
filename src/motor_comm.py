@@ -143,18 +143,18 @@ class motor_comm():
       #parse the response
       self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
     
-    def toggle_node_id(node_id):
+    def toggle_node_id(self, node_id):
       '''
       Toggles node id
       Takes current node id
-      Returns new node id
+      Sets new node id
       '''
       if (node_id==1):
         node_id = 0
       else:
         node_id = 1
 
-      return node_id
+      self.motor_response_node=node_id
 
 
 
