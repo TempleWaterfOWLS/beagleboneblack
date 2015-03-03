@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-
-# Node to interface motor controllers to ROS
-# Looks for motor power and motor node number from ROS 
-# Outputs the motor response information to ROS
-
+'''
+ Node to interface motor controllers to ROS
+ Looks for motor power and motor node number from ROS 
+ Outputs the motor response information to ROS
+'''
 from motor_comm import *
 import rospy
 from beagleboneblack.msg import MotorPower
