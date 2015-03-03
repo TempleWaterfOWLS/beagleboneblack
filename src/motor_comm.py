@@ -43,6 +43,9 @@ class motor_comm():
         #default to 0 motor node for responses
         self.motor_response_node = 0
         
+        #default response is empty list
+        self.response=[]
+        
         #open the serial port
         UART.setup("UART4")
         try:        
@@ -140,9 +143,13 @@ class motor_comm():
       response_buf = self.port.read(expected_response_length)
       print ("Got response: %d" % len(response_buf))
 
-      #parse the response
-      self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
-    
+      #parse the response. If no response all zeros in data
+      try:
+        self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
+      except struct.error:
+        for x in range(0,13):
+          self.response.append(0)
+        
     def toggle_node_id(self, node_id):
       '''
       Toggles node id
