@@ -23,7 +23,7 @@ def motor_response_to_ros(motors, pub, now):
   Function to take motor response and put it on ROS
   '''
   motor_data = MotorResponse()
-  
+
   #filling out MotorResponse message
   motor_data.header.stamp.secs = now.secs
   motor_data.header.stamp.nsecs = now.nsecs
@@ -33,9 +33,9 @@ def motor_response_to_ros(motors, pub, now):
   motor_data.bus_current = motors.response[9]
   motor_data.temperature = motors.response[10]
   motor_data.fault_flag = motors.response[11]
-  
+  motors.toggle_node_id()  
+
   pub.publish(motor_data)    
-  motors.toggle_node_id()
   
   
 def motor_node():
