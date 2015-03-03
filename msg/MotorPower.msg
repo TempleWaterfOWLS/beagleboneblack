@@ -1,2 +1,2 @@
-char motor_id
-float32 power
+float32 power1
+float32 power2
