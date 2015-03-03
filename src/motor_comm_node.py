@@ -39,7 +39,6 @@ def motor_node():
   Top level function to handle connection of motors with ROS
   '''
   motors = motor_comm()
-  node_id=1
   
   pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
@@ -50,7 +49,7 @@ def motor_node():
   while not rospy.is_shutdown():
     motors.send_motors_power_level()
     motor_response_to_ros(motors, pub)
-    rate.sleetp()
+    rate.sleep()
     
 
 
