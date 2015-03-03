@@ -31,7 +31,7 @@ def motor_response_to_ros(motors, pub):
   motor_data.fault_flag = motors.response[11]
   
   pub.publish(motor_data)    
-  motors.toggle_node_id(node_id)
+  motors.toggle_node_id()
   
   
 def motor_node():
