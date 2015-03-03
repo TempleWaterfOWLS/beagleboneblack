@@ -39,11 +39,7 @@ def motor_node():
   Top level function to handle connection of motors with ROS
   '''
   motors = motor_comm()
-<<<<<<< HEAD
-  
-=======
-    
->>>>>>> 3b9af6d0ed05f48b463531da5208cc74866eb8d6
+
   pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
   rospy.Subscriber("motor_power", MotorPower, power_level)
