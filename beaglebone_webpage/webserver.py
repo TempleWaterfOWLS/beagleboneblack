@@ -6,14 +6,20 @@ Created by Zack Smith 10/31/14
 # Imports for website generation
 from flask import *
 import os
-# Imports for motor integration - use thread to spawn threads and adjust global motor vals
+
 #change PYTHONPATH to find motor_comm
 import sys
 sys.path.append("../src")
 
+# Imports for motor integration - 
+#  use thread to spawn threads and adjust global motor vals
 from motor_comm import *
 from threading import Thread
 import time
+
+#ROS imports
+import rospy
+from beagleboneblack.msg import MotorPower
 
 M1 = -.0001; M2 = -.0001
 # Create instance of app
@@ -102,21 +108,28 @@ def set_globvar_M2(t_val):
 def print_thrust():
     #create object of class motor_comm
     motors = motor_comm()
+    pub = rospy.Publisher('motor_power', MotorPower, queue_size=10)
+    rospy.init_node('motor_control_website')
+    motor_power = MotorPower()
+    
     node_id = 0
     while not isinstance(M1,int) and not isinstance(M2,int):
         if (M1 == -.0001 and M2 == -.0001):
             continue
         print "Set thrust M1: "+ str(M1)+" M2: "+str(M2)
         print "Sending motor command"
-        motors.set_thrust(M1,M2)
-        #move motors and get response
-        motors.set_motor_response_node(node_id)
-        response=motors.send_motors_power_level()
-        response_array.append(response)
-        if (node_id==1):
-            node_id = 0
-        else:
-            node_id = 1
+        motor_power.power1 = M1
+        motor_power.power2 = M2
+        
+        #move motors
+        pub.publish(motor_power)
+        #motors.set_motor_response_node(node_id)
+        #response=motors.send_motors_power_level()
+        #response_array.append(response)
+        #if (node_id==1):
+        #    node_id = 0
+       # else:
+        #    node_id = 1
         print "Print Thrust"
         print M1, M2
         print type(M1), type(M2)
@@ -125,6 +138,7 @@ def print_thrust():
         print "execution finish"
 
 # Route to send data back to requesting thing
+#Not sure if we need this anymore
 @app.route('/pythoninfo', methods=['GET'])
 def send_data():
     sent_data = response_array
