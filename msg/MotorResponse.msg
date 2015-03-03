@@ -1,5 +1,5 @@
 Header header
-string motor_id
+uint8 motor_id
 float32 rpm
 float32 bus_voltage
 float32 bus_current
