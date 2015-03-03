@@ -147,7 +147,9 @@ class motor_comm():
       try:
         self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
       except struct.error:
-        for x in range(0,13):
+        self.response.append(0)
+        self.response.append(self.motor_response_node)
+        for x in range(2,13):
           self.response.append(0)
         
     def toggle_node_id(self):
