@@ -154,7 +154,7 @@ class motor_comm():
       else:
         node_id = 1
 
-      self.motor_response_node=node_id
+      self.motor_response_node=self.set_motor_response_node(node_id)
 
 
 
