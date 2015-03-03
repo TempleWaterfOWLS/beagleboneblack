@@ -9,9 +9,6 @@ import binascii
 import Adafruit_BBIO.UART as UART
 import Adafruit_BBIO.GPIO as GPIO
 
-#for ROS
-import rospy
-
 class motor_comm():
     def __init__(self):
         #VRCSR protocol defines  
@@ -145,6 +142,19 @@ class motor_comm():
 
       #parse the response
       self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
+    
+    def toggle_node_id(node_id):
+      '''
+      Toggles node id
+      Takes current node id
+      Returns new node id
+      '''
+      if (node_id==1):
+        node_id = 0
+      else:
+        node_id = 1
+
+      return node_id
 
 
 
