@@ -18,11 +18,15 @@ def power_level(data):
   motors.send_motors_power_level()
   
 
-def motor_response_to_ros(motors, pub):
+def motor_response_to_ros(motors, pub, now):
   '''
   Function to take motor response and put it on ROS
   '''
   motor_data = MotorResponse()
+  
+  #filling out MotorResponse message
+  motor_data.stamp.secs = now.secs
+  motor_data.stamp.nsecs = now.nsecs
   motor_data.motor_id = motors.response[1]
   motor_data.rpm = motors.response[7]
   motor_data.bus_voltage = motors.response[8]
@@ -44,11 +48,12 @@ def motor_node():
   rospy.init_node('motor_comm')
   rospy.Subscriber("motor_power", MotorPower, power_level)
   rate = rospy.Rate(10)
+  now = rospy.get_rostime()
   
   #spins at 10 Hz and puts the motors response on ROS
   while not rospy.is_shutdown():
     motors.send_motors_power_level()
-    motor_response_to_ros(motors, pub)
+    motor_response_to_ros(motors, pub, now)
     rate.sleep()
     
 
