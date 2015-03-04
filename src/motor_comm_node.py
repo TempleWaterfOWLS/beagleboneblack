@@ -10,23 +10,24 @@ from beagleboneblack.msg import MotorPower
 from beagleboneblack.msg import MotorResponse
 
 
-def power_level(data):
+def power_level(data,motors):
   '''
   Function to send power levels to motor 
   '''
   motors.set_thrust(data.power1,data.power2)
-  motors.send_motors_power_level()
+  if motors.send_motors_power_level():
+    motor_response_to_ros(motors)
   
 
-def motor_response_to_ros(motors, pub, now):
+def motor_response_to_ros(motors):
   '''
   Function to take motor response and put it on ROS
   '''
   motor_data = MotorResponse()
 
   #filling out MotorResponse message
-  motor_data.header.stamp.secs = now.secs
-  motor_data.header.stamp.nsecs = now.nsecs
+  motor_data.header.stamp.secs = motors.now.secs
+  motor_data.header.stamp.nsecs = motors.now.nsecs
   motor_data.motor_id = motors.response[1]
   motor_data.rpm = motors.response[7]
   motor_data.bus_voltage = motors.response[8]
@@ -35,7 +36,7 @@ def motor_response_to_ros(motors, pub, now):
   motor_data.fault_flag = motors.response[11]
   motors.toggle_node_id()  
 
-  pub.publish(motor_data)    
+  motors.pub.publish(motor_data)    
   
   
 def motor_node():
@@ -44,16 +45,16 @@ def motor_node():
   '''
   motors = motor_comm()
 
-  pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
+  motors.pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
-  rospy.Subscriber("motor_power", MotorPower, power_level)
-  rate = rospy.Rate(10)
-  now = rospy.get_rostime()
+  rate = rospy.Rate(5)
+  motors.now = rospy.get_rostime()
   
-  #spins at 10 Hz and puts the motors response on ROS
+  #spins at rate and puts the motors response on ROS
   while not rospy.is_shutdown():
-    motors.send_motors_power_level()
-    motor_response_to_ros(motors, pub, now)
+    if motors.send_motors_power_level():
+      motor_response_to_ros(motors)
+    rospy.Subscriber("motor_power", MotorPower, power_level, motors)
     rate.sleep()
     
 

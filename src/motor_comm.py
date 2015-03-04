@@ -42,7 +42,10 @@ class motor_comm():
         
         #default to 0 motor node for responses
         self.motor_response_node = 0
-        
+       
+        #deault for send_motor_command
+        self.send_motor_command = False
+  
         #open the serial port
         UART.setup("UART4")
         try:        
@@ -106,6 +109,12 @@ class motor_comm():
 	[11] = fault (hex)
 	[12] = payload checksum (hex)
       '''
+      #Check to see if method is in use by another program/thread
+      if self.send_motor_command:
+        return False
+      else:
+        self.send_motor_command = True
+
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
       flag = self.RESPONSE_THRUSTER_STANDARD
@@ -149,7 +158,10 @@ class motor_comm():
        self.response.append(self.motor_response_node)
        for x in range(2,13):
           self.response.append(0)
-        
+      
+      self.send_motor_command=False
+      return True
+  
     def toggle_node_id(self):
       '''
       Toggles node id between 0 and 1
