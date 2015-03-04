@@ -9,7 +9,6 @@ import binascii
 import Adafruit_BBIO.UART as UART
 import Adafruit_BBIO.GPIO as GPIO
 
-
 class motor_comm():
     def __init__(self):
         #VRCSR protocol defines  
@@ -43,7 +42,10 @@ class motor_comm():
         
         #default to 0 motor node for responses
         self.motor_response_node = 0
-        
+       
+        #deault for send_motor_command
+        self.send_motor_command = False
+  
         #open the serial port
         UART.setup("UART4")
         try:        
@@ -92,7 +94,27 @@ class motor_comm():
       '''
       Sends communication to motors
       Returns response list from the motor set in self.motor_node
+      Contents of response list
+      	[0] = sync (hex)
+	[1]= response node id (int)
+	[2] = flag (hex)
+	[3] = CSR address (hex)
+	[4] = length (hex)
+	[5] = header checksum (hex)
+	[6] = device type (hex)
+	[7] = rpm (float)
+	[8] = bus voltage (float)
+	[9] = bus current (float)
+	[10] = temperature (float C)
+	[11] = fault (hex)
+	[12] = payload checksum (hex)
       '''
+      #Check to see if method is in use by another program/thread
+      if self.send_motor_command:
+        return False
+      else:
+        self.send_motor_command = True
+
         #Create the custom command packet for setting the power level to a group of thrusters
         #generate the header
       flag = self.RESPONSE_THRUSTER_STANDARD
@@ -127,43 +149,29 @@ class motor_comm():
       response_buf = self.port.read(expected_response_length)
       print ("Got response: %d" % len(response_buf))
 
-      #parse the response
-      self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
+      #parse the response. If no response all zeros in data
+      try:
+        self.response = struct.unpack('=HBBBB I BffffB I', response_buf)
+      except struct.error:
+       self.response=[] 
+       self.response.append(0)
+       self.response.append(self.motor_response_node)
+       for x in range(2,13):
+          self.response.append(0)
+      
+      self.send_motor_command=False
+      return True
+  
+    def toggle_node_id(self):
+      '''
+      Toggles node id between 0 and 1
+      '''
+      if (self.motor_response_node==1):
+        node_id = 0
+      else:
+        node_id = 1
 
-    #header data
-    sync =              response[0]
-    response_node_id =  response[1]
-    flag =              response[2]
-    CSR_address =       response[3]
-    length =            response[4]
-    header_checksum =   response[5]
+      self.set_motor_response_node(node_id)
 
-    #response device type
-    device_type      =   response[6];
-
-    rpm = response[7]
-    bus_v = response[8]
-    bus_i = response[9]
-    temp = response[10]
-    fault = response[11]
-
-    payload_checksum = response[12]
-
-    print ("\nResponse:")
-    print ("\tSync:\t\t0x%x" % sync)
-    print ("\tId:\t\t%d" % response_node_id)
-    print ("\tFlag:\t\t0x%x" % flag)
-    print ("\tAddress:\t0x%x" % CSR_address)
-    print ("\tLength:\t\t0x%x" % length)
-    print ("\t\tChecksum: 0x%x" % header_checksum)
-
-    print ("\n\tDevice Type:\t\t0x%x" % device_type)
-    print ("\tRPM:\t\t\t%f" % rpm)
-    print ("\tBus Voltage (V):\t%f" % bus_v)
-    print ("\tBus Current (A):\t%f" % bus_i)
-    print ("\tTemp (C):\t\t%f" % temp)
-    print ("\tFault:\t\t\t0x%x" % fault)
-
-    print ("\t\tChecksum: 0x%x" % payload_checksum)
 
 
