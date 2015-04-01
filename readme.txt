@@ -9,7 +9,7 @@ To run the code:
  This will run the node. 
  
 To change the values sent to motor use:
- rostopic pub -r 1 beagleboneblack/MotorPower 0.1 0.1
+ rostopic pub -r 1 motor_power beagleboneblack/MotorPower 0.1 0.1
  
  This sends 10% power to both motors and updates at a rate of 1 Hz
  
