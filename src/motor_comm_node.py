@@ -15,8 +15,8 @@ def power_level(data,motors):
   Function to send power levels to motor 
   '''
   motors.set_thrust(data.power1,data.power2)
-  if motors.send_motors_power_level():
-    motor_response_to_ros(motors)
+#  if motors.send_motors_power_level():
+#    motor_response_to_ros(motors)
   
 
 def motor_response_to_ros(motors):
@@ -48,10 +48,10 @@ def motor_node():
   motors.pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
   rate = rospy.Rate(5)
-  motors.now = rospy.get_rostime()
   
   #spins at rate and puts the motors response on ROS
   while not rospy.is_shutdown():
+    motors.now = rospy.get_rostime()
     if motors.send_motors_power_level():
       motor_response_to_ros(motors)
     rospy.Subscriber("motor_power", MotorPower, power_level, motors)
