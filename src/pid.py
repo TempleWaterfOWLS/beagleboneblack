@@ -3,6 +3,7 @@
 #
 #cnr437@gmail.com
 #
+#Edits made by temple.roboboat.2015@gmail.com
 #######	Example	#########
 #
 #p=PID(3.0,0.4,1.2)
@@ -51,9 +52,7 @@ class PID:
 
 		self.I_value = self.Integrator * self.Ki
 
-		PID = self.P_value + self.I_value + self.D_value
-
-		return PID
+		self.PID = self.P_value + self.I_value + self.D_value
 
 	def setPoint(self,set_point):
 		"""
