@@ -14,6 +14,8 @@ class motor_control():
     #pid loop for each motor
     self.pid0=PID(0.0001)
     self.pid1=PID(0.0001)
+    
+    self.power_limit=0.5
       
     self.pub = rospy.Publisher('motor_power', MotorPower, queue_size=10)
     
@@ -24,7 +26,12 @@ class motor_control():
   def set_motor_power(self):
     self.motor_power.power1=self.pid0.PID+self.motor_power.power1
     self.motor_power.power2=self.pid1.PID+self.motor_power.power2
-
+    
+    if self.motor_power.power1 > self.power_limit:
+      self.motor_power.power1=self.power_limit
+    if self.motor_power.power2 > self.power_limit:
+      self.motor_power.power2=self.power_limit
+    
 def set_rpm(data,control):  
   control.pid0.setPoint(data.rpm0)
   control.pid1.setPoint(data.rpm1)
