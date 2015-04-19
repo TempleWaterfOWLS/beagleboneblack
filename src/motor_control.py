@@ -4,9 +4,10 @@
   The motors can only be sent a power percent. This node allows for control
    of RPM as well as looking for fault conditions such as stall and over heat.
 '''
+import rospy
 from pid import PID
 from beagleboneblack.msg import MotorPower
-from beagleboneblack.msg import MotorData
+from beagleboneblack.msg import MotorResponse
 from beagleboneblack.msg import MotorRPM
 
 class motor_control():
@@ -44,7 +45,7 @@ def get_data(data,control):
     control.data0=data
   elif data.motor_id==1:
     control.data1=data
-  else
+  else:
     control.error=data
   
 def motor_control_node():
@@ -66,10 +67,10 @@ def motor_control_node():
       control.pid0.update(0)
       control.pid1.update(0)
       
-    pub.publish(control.motor_power)
+    control.pub.publish(control.motor_power)
     
     rospy.Subscriber("motor_rpm", MotorRPM,set_rpm,control)
-    rospy.subscriber("motor_data", MotorResponse,get_data,control)
+    rospy.Subscriber("motor_data", MotorResponse,get_data,control)
   
 
 if __name__ == '__main__':
