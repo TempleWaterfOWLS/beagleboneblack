@@ -13,11 +13,11 @@ from beagleboneblack.msg import MotorRPM
 class motor_control():
   def __init__(self): 
     #pid loop for each motor
-    self.pid0=PID(0.00001)
-    self.pid1=PID(0.00001)
+    self.pid0=PID(P=0.0001, I=0.00001)
+    self.pid1=PID(P=0.0001, I=0.00001)
     
-    self.high_power_limit=0.35
-    self.low_power_limit=0.09
+    self.high_power_limit=0.70
+    self.low_power_limit=0.15
     self.low_rpm_limit=250
     self.deadband=0.1
       
