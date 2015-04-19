@@ -13,10 +13,13 @@ from beagleboneblack.msg import MotorRPM
 class motor_control():
   def __init__(self): 
     #pid loop for each motor
-    self.pid0=PID(0.0001)
-    self.pid1=PID(0.0001)
+    self.pid0=PID(0.00001)
+    self.pid1=PID(0.00001)
     
-    self.power_limit=0.5
+    self.high_power_limit=0.35
+    self.low_power_limit=0.09
+    self.low_rpm_limit=250
+    self.deadband=0.1
       
     self.pub = rospy.Publisher('motor_power', MotorPower, queue_size=10)
     
@@ -28,10 +31,39 @@ class motor_control():
     self.motor_power.power1=self.pid0.PID+self.motor_power.power1
     self.motor_power.power2=self.pid1.PID+self.motor_power.power2
     
-    if self.motor_power.power1 > self.power_limit:
-      self.motor_power.power1=self.power_limit
-    if self.motor_power.power2 > self.power_limit:
-      self.motor_power.power2=self.power_limit
+    if self.pid0.getPoint() > 0 and self.pid0.getPoint() < self.low_rpm_limit:
+      self.motor_power.power1=self.low_power_limit
+    elif self.pid0.getPoint() < 0 and self.pid0.getPoint() > -self.low_rpm_limit:
+      self.motor_power.power1=-self.low_power_limit
+    elif self.pid0.getPoint() == 0:
+      self.motor_power.power1=0
+    elif self.motor_power.power1 > self.high_power_limit:
+      self.motor_power.power1=self.high_power_limit
+    elif self.motor_power.power1 < self.low_power_limit:
+     # if self.motor_power.power1 > -self.low_power_limit+self.deadband and self.motor_power.power1 < self.low_power_limit-self.deadband: 
+     #   self.motor_power.power1=0
+      if self.motor_power.power1 < 0 and self.motor_power.power1 > -self.low_power_limit:
+        self.motor_power.power1 = -self.low_power_limit
+      elif self.motor_power.power1 < -self.high_power_limit:
+        self.motor_power.power1= -self.high_power_limit
+      else:
+        self.motor_power.power1=self.low_power_limit
+
+    if self.pid1.getPoint() > 0 and self.pid1.getPoint() < self.low_rpm_limit:
+      self.motor_power.power2=self.low_power_limit
+    elif self.pid1.getPoint() < 0 and self.pid1.getPoint() > -self.low_rpm_limit:
+      self.motor_power.power2=-self.low_power_limit
+    elif self.pid1.getPoint() == 0:
+      self.motor_power.power2=0
+    elif self.motor_power.power2 > self.high_power_limit:
+      self.motor_power.power2=self.high_power_limit
+    elif self.motor_power.power2 < self.low_power_limit:
+      if self.motor_power.power2 < 0 and self.motor_power.power2 > -self.low_power_limit:
+        self.motor_power.power2 = -self.low_power_limit
+      elif self.motor_power.power2 < -self.high_power_limit:
+        self.motor_power.power2= -self.high_power_limit
+      else:
+        self.motor_power.power2=self.low_power_limit
     
 def set_rpm(data,control):  
   control.pid0.setPoint(data.rpm0)
@@ -56,7 +88,7 @@ def motor_control_node():
   '''
   control=motor_control()
   rospy.init_node('motor_control')
-  rate = rospy.Rate(5)
+  rate = rospy.Rate(2)
   
   while not rospy.is_shutdown(): 
     #incase the motors haven't been turned on yet
@@ -66,12 +98,12 @@ def motor_control_node():
     except AttributeError:
       control.pid0.update(0)
       control.pid1.update(0)
-      
+    control.set_motor_power()      
     control.pub.publish(control.motor_power)
     
     rospy.Subscriber("motor_rpm", MotorRPM,set_rpm,control)
     rospy.Subscriber("motor_data", MotorResponse,get_data,control)
-  
+    rate.sleep()  
 
 if __name__ == '__main__':
   try: 

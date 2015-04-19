@@ -47,7 +47,7 @@ def motor_node():
 
   motors.pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
-  rate = rospy.Rate(5)
+  rate = rospy.Rate(20)
   
   #spins at rate and puts the motors response on ROS
   while not rospy.is_shutdown():
