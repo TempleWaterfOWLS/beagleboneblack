@@ -15,8 +15,6 @@ def power_level(data,motors):
   Function to send power levels to motor 
   '''
   motors.set_thrust(data.power1,data.power2)
-#  if motors.send_motors_power_level():
-#    motor_response_to_ros(motors)
   
 
 def motor_response_to_ros(motors):
