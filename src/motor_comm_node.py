@@ -12,7 +12,8 @@ from beagleboneblack.msg import MotorResponse
 
 def power_level(data,motors):
   '''
-  Function to send power levels to motor 
+  CALLBACK ON MotorPower
+  Function to send power levels to motor (for packet construction)
   '''
   motors.set_thrust(data.power1,data.power2)
   
@@ -41,8 +42,10 @@ def motor_node():
   '''
   Top level function to handle connection of motors with ROS
   '''
+  # Create an instance of the motor_comm class
+  # Class contains really gross looking firmware-related stuff and methods for payload creation to motor controllers. 
   motors = motor_comm()
-
+  # Initialize ROS node & motordata publisher
   motors.pub = rospy.Publisher('motor_data', MotorResponse, queue_size=10)
   rospy.init_node('motor_comm')
   rate = rospy.Rate(20)
@@ -50,8 +53,15 @@ def motor_node():
   #spins at rate and puts the motors response on ROS
   while not rospy.is_shutdown():
     motors.now = rospy.get_rostime()
+    # If the motor controllers are available, construct & send packet
     if motors.send_motors_power_level():
+      # Publish packet info 
       motor_response_to_ros(motors)
+    # Motor controllers are busy, do nothing
+    else:
+      pass
+
+    # ROS subscriber handlers - Callback functions: power_level
     rospy.Subscriber("motor_power", MotorPower, power_level, motors)
     rate.sleep()
     
