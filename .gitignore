@@ -3,3 +3,5 @@
 #ignore compiled(?) files from BeagleBoneBlack
 *.py.swp
 *.pyc
+#ignore temp files
+\#*
