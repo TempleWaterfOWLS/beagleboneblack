@@ -13,7 +13,6 @@ class motor_control ():
     self.motor_rpm.rpm1=0.0
     self.linear_scalar=300
     self.angular_scalar=50
-    self.rpm_scalar=100
     self.pub = rospy.Publisher('motor_rpm', MotorRPM, queue_size=10)
 
 def set_rpm (data, motors):
@@ -25,9 +24,40 @@ def set_rpm (data, motors):
     '''
     linear_x = data.linear.x * motors.linear_scalar 
     angular_z = data.angular.z * motors.angular_scalar
+    
+    if (angular_z == 0 and linear_x == 0):
+        motors.rpm_scalar1 = 0
+        motors.rpm_scalar0 = 0
+    #turn right like tanks
+    elif (angular_z < 0 and linear_x == 0):
+        motors.rpm_scalar1 = -190
+        motors.rpm_scalar0 = 190
+        print "angular_z<0 =", angular_z
+        print "linear_x==0 =", linear_x
+    #go backwards
+    elif (angular_z == 0 and linear_x < 0 or angular_z < 0 and linear_x < 0):
+        motors.rpm_scalar1 = -190
+        motors.rpm_scalar0 = -190
+        print "angular_z==0 =", angular_z
+        print "linear_x<0 =", linear_x
+    #turn right back not like tank
+    elif (angular_z > 0 and linear_x < 0):
+        motors.rpm_scalar1 = -190
+        motors.rpm_scalar0 = -190
+        print "angular_z>0 =", angular_z
+        print "linear_x<0 =", linear_x
+    #turn left like tank
+    elif (angular_z > 0 and linear_x == 0):
+        motors.rpm_scalar1 = 190
+        motors.rpm_scalar0 = -190
+        print "angular_z>0 =", angular_z
+        print "linear_x==0 =", linear_x
+    else:
+        motors.rpm_scalar1 = 190
+        motors.rpm_scalar0 = 190
 
-    motors.motor_rpm.rpm0 = linear_x - angular_z
-    motors.motor_rpm.rpm1 = linear_x + angular_z
+    motors.motor_rpm.rpm0 = linear_x - angular_z + motors.rpm_scalar0
+    motors.motor_rpm.rpm1 = linear_x + angular_z + motors.rpm_scalar1
 
 def manual_node():
   '''
